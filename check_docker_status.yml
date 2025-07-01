@@ -1,0 +1,15 @@
+---
+- name: Check Docker container status on target host
+  hosts: all
+  gather_facts: false  # Not strictly necessary for this task, speeds up
+  become: true         # Needed to run docker commands if user needs sudo/root
+
+  tasks:
+    - name: Run docker ps -a command
+      ansible.builtin.command: docker ps -a
+      register: docker_status_output
+      changed_when: false # This command doesn't change system state
+
+    - name: Display Docker container status
+      ansible.builtin.debug:
+        msg: "{{ docker_status_output.stdout_lines }}"
