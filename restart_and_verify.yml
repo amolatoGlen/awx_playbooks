@@ -1,0 +1,35 @@
+---
+- name: Restart all Docker containers and verify status
+  hosts: all
+  gather_facts: false # Speeds up execution
+  become: true        # Required to run Docker commands
+
+  tasks:
+    - name: Restart all Docker containers (including stopped ones to start them)
+      ansible.builtin.shell: docker restart $(docker ps -aq)
+      register: restart_output
+      changed_when: true # This command definitely changes state if containers exist
+      args:
+        warn: false # Suppress warning about using shell instead of command for piping
+
+    - name: Display restart command output
+      ansible.builtin.debug:
+        msg: "Docker restart command output:\n{{ restart_output.stdout }}"
+      when: restart_output.stdout | length > 0
+
+    - name: Verify currently running Docker containers
+      ansible.builtin.shell: docker ps
+      register: verify_output
+      changed_when: false # This command only checks status, doesn't change state
+      args:
+        warn: false # Suppress warning
+
+    - name: Display currently running Docker containers
+      ansible.builtin.debug:
+        msg: "Currently running Docker containers:\n{{ verify_output.stdout }}"
+      when: verify_output.stdout | length > 0
+
+    - name: Handle case where no containers were found
+      ansible.builtin.debug:
+        msg: "No Docker containers found to restart or verify on this host."
+      when: restart_output.stdout == "" and verify_output.stdout == ""
