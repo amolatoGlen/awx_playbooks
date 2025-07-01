@@ -1,16 +1,18 @@
 ---
 - name: Restart all Docker containers and verify status
   hosts: all
-  gather_facts: false # Speeds up execution
-  become: true        # Required to run Docker commands
+  gather_facts: false
+  become: true
 
   tasks:
     - name: Restart all Docker containers (including stopped ones to start them)
       ansible.builtin.shell: docker restart $(docker ps -aq)
       register: restart_output
-      changed_when: true # This command definitely changes state if containers exist
-      args:
-        warn: false # Suppress warning about using shell instead of command for piping
+      changed_when: true
+      args: # <--- THIS 'args:' MUST BE DIRECTLY UNDER 'ansible.builtin.shell:'
+        warn: false # <--- THIS 'warn: false' MUST BE DIRECTLY UNDER 'args:'
+      # Ensure there are exactly 2 spaces indentation for 'args:' from 'ansible.builtin.shell:'
+      # And 2 spaces for 'warn: false' from 'args:'
 
     - name: Display restart command output
       ansible.builtin.debug:
@@ -20,9 +22,9 @@
     - name: Verify currently running Docker containers
       ansible.builtin.shell: docker ps
       register: verify_output
-      changed_when: false # This command only checks status, doesn't change state
-      args:
-        warn: false # Suppress warning
+      changed_when: false
+      args: # <--- AND HERE TOO
+        warn: false
 
     - name: Display currently running Docker containers
       ansible.builtin.debug:
