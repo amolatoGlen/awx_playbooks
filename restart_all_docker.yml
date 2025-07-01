@@ -1,0 +1,17 @@
+---
+- name: Restart all Docker containers on target hosts
+  hosts: all
+  gather_facts: false # Speeds up execution if facts aren't needed
+  become: true        # Required to run Docker commands
+
+  tasks:
+    - name: Restart all running Docker containers
+      community.docker.docker_container:
+        name: all      # Targets all containers
+        state: restarted # Ensures they are in a restarted state
+        # You can add 'force_recreate: true' if you want to ensure they are fully rebuilt (use with caution)
+      register: docker_restart_result
+
+    - name: Display restart result
+      ansible.builtin.debug:
+        msg: "Docker containers restart result: {{ docker_restart_result }}"
