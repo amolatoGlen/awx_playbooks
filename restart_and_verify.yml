@@ -6,14 +6,10 @@
 
   tasks:
     - name: Restart all Docker containers (including stopped ones to start them)
-      # Ensure 'ansible.builtin.shell:' is exactly as shown below,
-      # with 'args:' indented exactly two spaces from it.
       ansible.builtin.shell: docker restart $(docker ps -aq)
       register: restart_output
       changed_when: true
-      args: # <--- Ensure this 'args:' is indented by 4 spaces from the task name,
-            #     and 2 spaces from 'ansible.builtin.shell:' line above it.
-        warn: false # <--- Ensure this 'warn: false' is indented by 2 spaces from 'args:'
+      # REMOVE THE ENTIRE 'args:' BLOCK HERE
 
     - name: Display restart command output
       ansible.builtin.debug:
@@ -21,12 +17,10 @@
       when: restart_output.stdout | length > 0
 
     - name: Verify currently running Docker containers
-      # Same indentation rules apply here for 'ansible.builtin.shell:' and 'args:'
       ansible.builtin.shell: docker ps
       register: verify_output
       changed_when: false
-      args: # <--- Indentation must be correct here too.
-        warn: false
+      # REMOVE THE ENTIRE 'args:' BLOCK HERE
 
     - name: Display currently running Docker containers
       ansible.builtin.debug:
