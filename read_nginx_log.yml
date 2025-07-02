@@ -1,20 +1,16 @@
 ---
 - name: Read Nginx access log on vm3
-  hosts: vm3
+  hosts: vm3 # Target only vm3 or its IP if not named vm3 in inventory
   gather_facts: false
-  become: true
+  become: true # Needed for 'sudo su' and accessing /var/log
 
   tasks:
-    - name: Change to root user and read nginx access log with grep
+    - name: Change to root user and read entire nginx access log
       ansible.builtin.shell: |
         sudo su -
-        # Use 'grep_pattern' variable here. If it's empty, grep for everything (.*)
-        # Using 'awk 1' as a fallback if grep_pattern is empty, it prints all lines.
-        # Alternatively, 'cat /var/log/nginx/access.log | grep -E "{{ grep_pattern | default('.*') }}"'
-        # The 'grep -E' handles basic regex. If you need fixed strings, use 'grep -F'.
-        cat /var/log/nginx/access.log | grep -E "{{ grep_pattern | default('.*') }}"
+        cat /var/log/nginx/access.log
       register: nginx_log_output
-      changed_when: false
+      changed_when: false # This command only reads, doesn't change state
 
     - name: Display Nginx access log content
       ansible.builtin.debug:
