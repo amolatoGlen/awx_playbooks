@@ -1,5 +1,6 @@
 ---
 - name: Read Nginx access log on vm3
+  hosts: all # Target only vm3 or its IP if not named vm3 in inventory
   gather_facts: false
   become: true # Needed for 'sudo su' and accessing /var/log
 
